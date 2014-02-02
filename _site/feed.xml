@@ -72,43 +72,5 @@
 				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/%E4%BD%BF%E7%94%A8Markdown%E5%86%99%E6%96%87%E7%AB%A0.html</guid>
 			</item>
 		
-			<item>
-				<title>Hello World!</title>
-				<description>&lt;p&gt;&lt;strong&gt;dbyll&lt;/strong&gt; is minimalist, stylish theme for jekyll. Supports gravatar, account links (github, twitter, e-mail, pinterest, résume file) and a bio.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;dbyll&lt;/strong&gt; is brought to you by &lt;strong&gt;&lt;a href=&quot;http://ismaildemirbilek.com&quot;&gt;dbtek&lt;/a&gt;&lt;/strong&gt;. Open sourced under &lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;MIT&lt;/a&gt; license.&lt;/p&gt;
-
-&lt;h4 id=&quot;dbyll_is_on_github&quot;&gt;dbyll is on GitHub&lt;/h4&gt;
-
-&lt;p&gt;&lt;a class=&#39;btn btn-default&#39; href=&#39;https://github.com/dbtek/dbyll&#39;&gt;Grab your copy now!&lt;/a&gt;&lt;/p&gt;</description>
-				<pubDate>Fri, 15 Nov 2013 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/general/setup/demo/2013/11/15/hello-world.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/general/setup/demo/2013/11/15/hello-world.html</guid>
-			</item>
-		
-			<item>
-				<title>Sample 2</title>
-				<description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
-
-&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;</description>
-				<pubDate>Thu, 14 Nov 2013 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/general/demo/sample/2013/11/14/sample-2.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/general/demo/sample/2013/11/14/sample-2.html</guid>
-			</item>
-		
-			<item>
-				<title>Sample</title>
-				<description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
-
-&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
-&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;foo&lt;/span&gt;
-  &lt;span class=&#39;nb&#39;&gt;puts&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;foo&amp;#39;&lt;/span&gt;
-&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
-				<pubDate>Thu, 14 Nov 2013 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/general/demo/2013/11/14/sample.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/general/demo/2013/11/14/sample.html</guid>
-			</item>
-		
 	</channel>
 </rss>

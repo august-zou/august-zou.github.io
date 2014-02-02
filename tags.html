@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Tags
+title: 标签
 header: Posts By Tag
 group: navigation
 ---
@@ -32,7 +32,6 @@ group: navigation
 <div class="tab-content col-sm-9 col-xs-6">
   {% for tag in site.tags %}
     <div class="tab-pane" id="{{ tag[0] }}-ref">
-      <h2 style="margin-top: 0px">Posts tagged  with {{ tag[0] }}</h2>
       <ul class="list-unstyled">
         {% assign pages_list = tag[1] %}
         {% for node in pages_list %}

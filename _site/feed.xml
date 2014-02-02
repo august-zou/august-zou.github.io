@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>我的一点点</title>
+		<description>思考一点点，写下一点点，就会多一点点</description>
+		<link>http://www.xuzou.me/</link>
+		<atom:link href="http://www.xuzou.me/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>使用Markdown写文章</title>
+				<description>&lt;h3 id=&quot;_markdown&quot;&gt;关于 Markdown&lt;/h3&gt;
+
+&lt;p&gt;使用特定标点符号作为有意义和格式的标识符，通过Markdown渲染引擎，生成html文件，呈现有样式的文章。非常适合作为一种书写语言。&lt;/p&gt;
+
+&lt;h3 id=&quot;markdwon_&quot;&gt;Markdwon 语法&lt;/h3&gt;
+
+&lt;h4 id=&quot;&quot;&gt;段落&lt;/h4&gt;
+
+&lt;p&gt;回车：行末尾两个或两个以上的空格&lt;/p&gt;
+
+&lt;h4 id=&quot;_2&quot;&gt;标题&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Setext形式是用底线的形式，利用=（第一标题）和-（第二标题），&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;Atx形式则是在行首插入1至6個#，对应到6阶标题： &lt;br /&gt; # 这是 H1 &lt;br /&gt; ## 这是 H2 &lt;br /&gt; ###### 这是 H6&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;_3&quot;&gt;清单&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;无编号方式&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Red&lt;/li&gt;
+
+&lt;li&gt;Green&lt;/li&gt;
+
+&lt;li&gt;Blue&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;有编号方式&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Bird&lt;/li&gt;
+
+&lt;li&gt;McHale&lt;/li&gt;
+
+&lt;li&gt;Parish&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;_4&quot;&gt;超链接&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;This is [an example](http://example.com/ &amp;quot;Title&amp;quot;) inline link.
+
+[This link](http://example.net/) has no title attribute.&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;_5&quot;&gt;图片&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;![Alt text](/path/to/img.jpg)&lt;/code&gt;&lt;/pre&gt;</description>
+				<pubDate>Sun, 02 Feb 2014 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/%E4%BD%BF%E7%94%A8Markdown%E5%86%99%E6%96%87%E7%AB%A0.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/%E4%BD%BF%E7%94%A8Markdown%E5%86%99%E6%96%87%E7%AB%A0.html</guid>
+			</item>
+		
+			<item>
+				<title>Hello World!</title>
+				<description>&lt;p&gt;&lt;strong&gt;dbyll&lt;/strong&gt; is minimalist, stylish theme for jekyll. Supports gravatar, account links (github, twitter, e-mail, pinterest, résume file) and a bio.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;dbyll&lt;/strong&gt; is brought to you by &lt;strong&gt;&lt;a href=&quot;http://ismaildemirbilek.com&quot;&gt;dbtek&lt;/a&gt;&lt;/strong&gt;. Open sourced under &lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;MIT&lt;/a&gt; license.&lt;/p&gt;
+
+&lt;h4 id=&quot;dbyll_is_on_github&quot;&gt;dbyll is on GitHub&lt;/h4&gt;
+
+&lt;p&gt;&lt;a class=&#39;btn btn-default&#39; href=&#39;https://github.com/dbtek/dbyll&#39;&gt;Grab your copy now!&lt;/a&gt;&lt;/p&gt;</description>
+				<pubDate>Fri, 15 Nov 2013 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/general/setup/demo/2013/11/15/hello-world.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/general/setup/demo/2013/11/15/hello-world.html</guid>
+			</item>
+		
+			<item>
+				<title>Sample 2</title>
+				<description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;</description>
+				<pubDate>Thu, 14 Nov 2013 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/general/demo/sample/2013/11/14/sample-2.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/general/demo/sample/2013/11/14/sample-2.html</guid>
+			</item>
+		
+			<item>
+				<title>Sample</title>
+				<description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;foo&lt;/span&gt;
+  &lt;span class=&#39;nb&#39;&gt;puts&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;foo&amp;#39;&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+				<pubDate>Thu, 14 Nov 2013 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/general/demo/2013/11/14/sample.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/general/demo/2013/11/14/sample.html</guid>
+			</item>
+		
+	</channel>
+</rss>

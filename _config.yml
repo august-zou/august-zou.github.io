@@ -11,30 +11,16 @@ author:
   name: xuzou
   email: zjzouxu@gmail.com
   github: august-zou
-  twitter: august-zou
-  pinterest: august
-  linkedin: august
+  twitter: augustzou
+  pinterest: 
+  linkedin: 
+  weibo: xuzou
   bio: 思考一点点，写下一点点，就会多一点点!
   email_md5: 58155757e0bb79f6bb85f28854a5c3b0
 
 rss_path: feed.xml
 categories_path: categories.html
 tags_path: tags.html
+about_path: about.html
 
 BASE_PATH: http://www.xuzou.me
-
-# All links will be namespaced by BASE_PATH if defined.
-# Links in your website should always be prefixed with {{ site.BASE_PATH }}
-# Do not put a "/" at the end of the url.
-#
-# CNAME (http://yourcustomdomain.com)
-#   DO NOT SET BASE_PATH JUST LEAVE IT BLANK 
-#   (urls will be prefixed with "/" and work relatively)
-#
-# GitHub Pages (http://username.github.io)
-#   DO NOT SET BASE_PATH JUST LEAVE IT BLANK 
-#   (urls will be prefixed with "/" and work relatively)
-#
-# GitHub Project Pages (http://username.github.io/project-name)
-#  A GitHub Project site exists in the `gh-pages` branch of one of your repositories.
-#  REQUIRED! Set BASE_PATH to "http://username.github.io/project-name"

@@ -7,6 +7,7 @@ fullview: true
 ---
 
 ### 关于 Markdown
+![markdown](/images/markdown.png)    
 使用特定标点符号作为有意义和格式的标识符，通过Markdown渲染引擎，生成html文件，呈现有样式的文章。非常适合作为一种书写语言。
 
 ### Markdwon 语法

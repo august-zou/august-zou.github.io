@@ -10,7 +10,7 @@
 				<title>使用Markdown写文章</title>
 				<description>&lt;h3 id=&quot;_markdown&quot;&gt;关于 Markdown&lt;/h3&gt;
 
-&lt;p&gt;使用特定标点符号作为有意义和格式的标识符，通过Markdown渲染引擎，生成html文件，呈现有样式的文章。非常适合作为一种书写语言。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/markdown.png&quot; alt=&quot;markdown&quot; /&gt; &lt;br /&gt;使用特定标点符号作为有意义和格式的标识符，通过Markdown渲染引擎，生成html文件，呈现有样式的文章。非常适合作为一种书写语言。&lt;/p&gt;
 
 &lt;h3 id=&quot;markdwon_&quot;&gt;Markdwon 语法&lt;/h3&gt;
 

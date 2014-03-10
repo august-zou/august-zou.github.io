@@ -5,8 +5,6 @@ categories: [编程,翻译,Ruby]
 tags: [ruby,code style]
 fullview: true
 ---
-#【译】Ruby编码规范
----
 
 本文档翻译与[Github ruby-style-guide](https://github.com/styleguide/ruby)    
 本文档是GitHub内部使用的Ruby规范编码规范。原文档参考了[ruby-style-guid](https://github.com/bbatsov/ruby-style-guide)

@@ -68,8 +68,24 @@
 
 &lt;pre&gt;&lt;code&gt;![Alt text](/path/to/img.jpg)&lt;/code&gt;&lt;/pre&gt;</description>
 				<pubDate>Sun, 02 Feb 2014 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/%E4%BD%BF%E7%94%A8Markdown%E5%86%99%E6%96%87%E7%AB%A0.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/%E4%BD%BF%E7%94%A8Markdown%E5%86%99%E6%96%87%E7%AB%A0.html</guid>
+				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/writing-articles-using-markdown.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/writing-articles-using-markdown.html</guid>
+			</item>
+		
+			<item>
+				<title>git vs svn</title>
+				<description>&lt;p&gt;git 发展于linux的代码管理，自身带有浓烈的黑客色彩。git的分布式代码管理和简易的分支管理，正是敏捷开发所寻找的快步小走的模式。&lt;/p&gt;
+
+&lt;h3 id=&quot;_vs_&quot;&gt;分布式 vs 集中式&lt;/h3&gt;
+
+&lt;p&gt;git 的版本管理模式是分布式的，在每个本地版本（克隆版本）保存了代码库的完整版本信息，方便离线工作。这样可以很方便的进行分支的提交和同步。 &lt;br /&gt;svn 的版本管理模式是集中式，只有在服务器上保存了代码库的完整信息&lt;/p&gt;
+
+&lt;h3 id=&quot;&quot;&gt;不同的分支管理模式&lt;/h3&gt;
+
+&lt;p&gt;git 分支是轻量的分支，在各个分支切换十分方便，分支与主支在同一目录下，可以方便的查看分支的状态 &lt;br /&gt;svn 的分支基本是在与主支（trunk）不同的目录（branchs）下,切换繁琐&lt;/p&gt;</description>
+				<pubDate>Sun, 02 Feb 2014 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E7%BC%96%E7%A8%8B/git/2014/02/02/git-vs-svn.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E7%BC%96%E7%A8%8B/git/2014/02/02/git-vs-svn.html</guid>
 			</item>
 		
 	</channel>

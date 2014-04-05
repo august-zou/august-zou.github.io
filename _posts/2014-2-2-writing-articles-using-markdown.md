@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 使用Markdown写文章
-categories: [关于文字]
+categories: [writing]
 tags: [Markdown,语法，文字]
 fullview: true
 ---

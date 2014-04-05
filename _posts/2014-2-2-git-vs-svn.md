@@ -1,7 +1,7 @@
 ---
 layout: post
 title: git vs svn
-categories: [关于编程,git]
+categories: [coding,git]
 tags: [git,ruby on rails]
 fullview: true
 ---

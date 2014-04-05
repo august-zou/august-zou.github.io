@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<! -- header.html -->
+<meta charset="utf-8">
+<title>【译】Ruby编码规范</title>
+
+<meta name="author" content="xuzou">
+
+<!-- Enable responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+ <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- Le styles -->
+<link href="http://www.xuzou.me/assets/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://www.xuzou.me/assets/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="http://www.xuzou.me/assets/resources/syntax/syntax.css" rel="stylesheet">
+<link href="http://www.xuzou.me/assets/css/style.css" rel="stylesheet">
+
+<!-- Le fav and touch icons -->
+<!-- Update these with your own images
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+-->
+
+ <link rel="alternate" type="application/rss+xml" title="" href="http://www.xuzou.me/feed.xml">
+
+<! -- header.html end -->
+
+
+   <body>
+   		<nav class="navbar navbar-default visible-xs" role="navigation">
+		  <!-- Brand and toggle get grouped for better mobile display -->
+		  <div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+			  <span class="sr-only">Toggle navigation</span>
+			  <span class="icon-bar"></span>
+			  <span class="icon-bar"></span>
+			  <span class="icon-bar"></span>
+			</button>
+			
+			<a type="button" class="navbar-toggle nav-link" href="http://github.com/august-zou">
+		      <i class="fa fa-github"></i>
+		    </a>
+		    
+		    
+		    <a type="button" class="navbar-toggle nav-link" href="http://twitter.com/augustzou">
+		      <i class="fa fa-twitter"></i>
+		    </a>
+		    
+		    
+		    <a type="button" class="navbar-toggle nav-link" href="mailto:zjzouxu@gmail.com">
+		      <i class="fa fa-envelope"></i>
+		    </a>
+		    
+			<a class="navbar-brand" href="http://www.xuzou.me/">
+				<img src="http://www.gravatar.com/avatar/58155757e0bb79f6bb85f28854a5c3b0?s=35" class="img-circle" />
+				我的一点点
+			</a>
+		  </div>
+
+		  <!-- Collect the nav links, forms, and other content for toggling -->
+		  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+			  <li class="active"><a href="http://www.xuzou.me/">首页</a></li>
+        <li><a href="http://www.xuzou.me/about.html"> 关于</a></li>
+			  <li><a href="http://www.xuzou.me/categories.html">归档</a></li>
+  			  <li><a href="http://www.xuzou.me/tags.html">标签</a></li>
+			</ul>
+		  </div><!-- /.navbar-collapse -->
+		</nav>
+
+       <!-- nav-menu-dropdown -->
+       <div class="btn-group hidden-xs" id="nav-menu">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-bars"></i>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="http://www.xuzou.me/"><i class="fa fa-home"></i> 首页</a></li>
+            <li><a href="http://www.xuzou.me/about.html"><i class="fa fa-user"></i> 关于</a></li>
+            <li><a href="http://www.xuzou.me/categories.html"><i class="fa fa-folder"></i> 归档</a></li>
+            <li><a href="http://www.xuzou.me/tags.html"><i class="fa fa-tags"></i> 标签</a></li>
+              <li class="divider"></li>
+            <li><a href="#"><i class="fa fa-arrow-up"></i> 页首</a></li>
+          </ul>
+       </div>
+
+		<div class="col-sm-3 sidebar hidden-xs">
+			<! -- sidebar.html -->
+<header class="sidebar-header" role="banner">
+	<a href="http://www.xuzou.me/">
+		<img src="http://www.gravatar.com/avatar/58155757e0bb79f6bb85f28854a5c3b0?s=150" class="img-circle" />
+	</a>
+	<h3 class="title">
+        <a href="http://www.xuzou.me/">我的一点点</a>
+    </h3>
+</header>
+
+
+<div id="bio" class="text-center">
+	思考一点点，写下一点点，就会多一点点!
+</div>
+
+
+<div id="contact-list" class="text-center">
+	<ul class="list-unstyled list-inline">
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="https://github.com/august-zou">
+				<i class="fa fa-github-alt fa-lg"></i>
+			</a>
+		</li>
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="http://weibo.com/xuzou">
+				<i class="fa fa-weibo fa-lg"></i>
+			</a>
+		</li>
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="mailto:zjzouxu@gmail.com">
+				<i class="fa fa-envelope fa-lg"></i>
+			</a>
+		</li>
+		
+	</ul>
+
+	<ul id="contact-list-secondary" class="list-unstyled list-inline">
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="https://twitter.com/augustzou">
+				<i class="fa fa-twitter fa-lg"></i>
+			</a>
+		</li>
+		
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="http://www.xuzou.me/feed.xml">
+				<i class="fa fa-rss fa-lg"></i>
+			</a>
+		</li>
+	</ul>
+</div>
+
+	
+
+<! -- sidebar.html end -->
+
+		</div>
+
+		<div class="col-sm-9 col-sm-offset-3">
+			<article>
+	<div class="page-header">
+	  <h1>【译】Ruby编码规范 </h1>
+	</div>
+
+	<div class="col-sm-10">
+	 <span class="post-date">
+	   
+	   March 
+	   10th,
+	   
+	   2014
+	 </span>
+	  <div class="article_body">
+	  <p>本文档翻译与<a href="https://github.com/styleguide/ruby">Github ruby-style-guide</a> <br />本文档是GitHub内部使用的Ruby规范编码规范。原文档参考了<a href="https://github.com/bbatsov/ruby-style-guide">ruby-style-guid</a></p>
+
+<h2 id="">编码风格</h2>
+<hr />
+<ul>
+<li>
+<p>使用空格符进行代码的缩进，而不是使用Tab</p>
+</li>
+
+<li>
+<p>每行代码少于80个字符</p>
+</li>
+
+<li>
+<p>不要再一行的后面留有空格</p>
+</li>
+
+<li>
+<p>每个文件留一空行</p>
+</li>
+
+<li>
+<p>操作符之后留一个空格，在逗号、冒号、大括号之后留空格</p>
+
+<pre><code>sum = 1 + 2   
+	a, b = 1, 2    
+1 &gt; 2 ? true : false; puts &quot;Hi&quot;    
+[1, 2, 3].each { |e| puts e } </code></pre>
+</li>
+
+<li>
+<p>不要在<code>(, [ 和 ], )</code>符号之前留空格</p>
+
+<pre><code>some(arg).other
+[1, 2, 3].length</code></pre>
+</li>
+
+<li>
+<p>在<code> ! </code>空格前不要留空格</p>
+
+<pre><code>!array.include?(element)</code></pre>
+</li>
+
+<li>
+<p>缩进 <code>case...when...</code></p>
+
+<pre><code>case
+when song.name == &quot;Misty&quot;
+  puts &quot;Not again!&quot;
+when song.duration &gt; 120
+  puts &quot;Too long!&quot;
+when Time.now.hour &gt; 21
+  puts &quot;It&#39;s too late&quot;
+else
+  song.play
+end
+
+kind = case year
+       when 1850..1889 then &quot;Blues&quot;
+       when 1890..1909 then &quot;Ragtime&quot;
+       when 1910..1929 then &quot;New Orleans Jazz&quot;
+       when 1930..1939 then &quot;Swing&quot;
+       when 1940..1950 then &quot;Bebop&quot;
+       else &quot;Jazz&quot;
+       end</code></pre>
+</li>
+
+<li>
+<p>在两个方法之间插入一空行，每个方法内通过空行来归约逻辑关系</p>
+
+<pre><code>  def some_method
+    data = initialize(options)
+
+    data.manipulate!
+
+    data.result
+  end
+
+  def some_method
+    result
+  end</code></pre>
+</li>
+</ul>
+
+<h2 id="_2">文档</h2>
+<hr />
+<p>使用<a href="http://tomdoc.org/">TomDoc</a>规范注释文档格式，其格式大致如下：</p>
+
+<pre><code>	# Public: Duplicate some text an arbitrary number of times.
+	#
+	# text  - The String to be duplicated.
+	# count - The Integer number of times to duplicate the text.
+	#
+	# Examples
+	#
+	#   multiplex(&quot;Tom&quot;, 4)
+	#   # =&gt; &quot;TomTomTomTom&quot;
+	#
+	# Returns the duplicated String.
+	def multiplex(text, count)
+	  text * count
+	end</code></pre>
+
+<h2 id="_3">代码排版约定</h2>
+<hr />
+<ul>
+<li>
+<p>定义方法时，无参数时省略圆括号，当有参数时需要加圆括号，如：</p>
+
+<pre><code>   def some_method
+     # body omitted
+   end
+
+   def some_method_with_arguments(arg1, arg2)
+     # body omitted
+   end</code></pre>
+</li>
+
+<li>
+<p>不要使用for语句，除非你确定for语句优于迭代方案。请使用each,each方法中会使用for.注意：for语句并不会重新定义一个作用域，在其中定义的变量，在其外部依然可见。</p>
+
+<pre><code>  arr = [1, 2, 3]
+
+  # bad
+  for elem in arr do
+    puts elem
+  end
+
+  # good
+  arr.each { |elem| puts elem }</code></pre>
+</li>
+
+<li>
+<p>对于多行<code>if/uless</code>不要使用<code>then</code></p>
+
+<pre><code> # bad
+if some_condition then
+  # body omitted
+end
+
+# good
+if some_condition
+  # body omitted
+end</code></pre>
+</li>
+
+<li>
+<p>除非其他表达式太过于繁琐，尽量避免使用三元表达式（<code>?:</code>）。当时用（if/then/else/end）这种结构，并在单行出现时，请使用（<code>?:</code>）</p>
+
+<pre><code>  # bad
+  result = if some_condition then something else something_else end
+
+  # good
+  result = some_condition ? something : something_else</code></pre>
+</li>
+
+<li>
+<p>使用三元表达式时，请勿嵌套使用</p>
+
+<pre><code>  # bad
+  some_condition ? (nested_condition ? nested_something : nested_something_else) : something_else
+
+  # good
+  if some_condition
+    nested_condition ? nested_something : nested_something_else
+  else
+    something_else
+  end</code></pre>
+</li>
+
+<li>
+<p>不提倡使用ruby中<code>and</code> 和 <code>or</code> 关键字，永远使用<code>&amp;&amp;</code>和<code>||</code></p>
+</li>
+
+<li>
+<p>在单行中有条件判断语句时，请使用<code>if/unless</code></p>
+
+<pre><code>  # bad
+  if some_condition
+    do_something
+  end
+
+  # good
+  do_something if some_condition</code></pre>
+</li>
+
+<li>
+<p><strong>永远不要</strong>出现<code>unless</code>和<code>else</code> 共同使用 # bad unless success? puts “failure” else puts “success” end</p>
+
+<pre><code># good
+if success?
+  puts &quot;success&quot;
+else
+  puts &quot;failure&quot;
+ end</code></pre>
+</li>
+
+<li>
+<p>在 <code>if/unless/while</code>的条件判断语句之后，判断表达式不要使用圆括号</p>
+
+<pre><code># bad
+if (x &gt; 10)
+  # body omitted
+end
+
+# good
+if x &gt; 10
+  # body omitted
+end</code></pre>
+</li>
+
+<li>
+<p>在单行块中使用<code>{...}</code>。<strong>永远不要</strong>在多行中使用<code>{...}</code>，而是使用<code>do...end</code>。在调用链中不要使用<code>do...end</code></p>
+
+<pre><code>names = [&quot;Bozhidar&quot;, &quot;Steve&quot;, &quot;Sarah&quot;]
+
+# good
+names.each { |name| puts name }
+
+# bad
+names.each do |name|
+  puts name
+end
+
+# good
+names.select { |name| name.start_with?(&quot;S&quot;) }.map { |name| name.upcase }
+
+# bad
+names.select do |name|
+  name.start_with?(&quot;S&quot;)
+end.map { |name| name.upcase }</code></pre>
+</li>
+
+<li>
+<p>避免使用不必要的<code>return</code></p>
+
+<pre><code># bad
+def some_method(some_arr)
+  return some_arr.size
+end
+
+# good
+def some_method(some_arr)
+  some_arr.size
+end</code></pre>
+</li>
+
+<li>
+<p>当为方法的参数赋默认值时，在<code>=</code>号前后添加空格</p>
+
+<pre><code># bad
+def some_method(arg1=:default, arg2=nil, arg3=[])
+  # do something...
+end
+
+# good
+def some_method(arg1 = :default, arg2 = nil, arg3 = [])
+  # do something...
+end</code></pre>
+</li>
+
+<li>
+<p>可以对使用返回值进行赋值</p>
+
+<pre><code># bad
+if (v = array.grep(/foo/)) ...
+
+# good
+if v = array.grep(/foo/) ...
+
+# also good - has correct precedence.
+if (v = next_value) == &quot;hello&quot; ...</code></pre>
+</li>
+
+<li>
+<p>在可以的时候尽量使用<code>||=</code>进行变量的初始化</p>
+
+<pre><code># set name to Bozhidar, only if it&#39;s nil or false
+name ||= &quot;Bozhidar&quot;</code></pre>
+</li>
+
+<li>
+<p><strong>永远不要</strong>使用<code>||=</code>初始赋值布尔类型变量</p>
+
+<pre><code># bad - would set enabled to true even if it was false
+enabled ||= true
+
+# good
+enabled = true if enabled.nil?</code></pre>
+</li>
+
+<li>
+<p>避免使用Perl风格的变量命名（如$0-9,$,etc）.这种命名方式过于简单而无意义。请使用有意义的命名发如（$PROGRAM_NAME）。</p>
+</li>
+
+<li>
+<p><strong>永远不要</strong>再方法名之后添加空格</p>
+
+<pre><code># bad
+f (3 + 2) + 1
+
+# good
+f(3 + 2) + 1</code></pre>
+</li>
+
+<li>
+<p>如果方法名称之后是一个圆括号，则在之后都是用括号(如f((3 + 2) + 1))</p>
+</li>
+
+<li>
+<p>使用<code>_</code>作为块中未使用的参数</p>
+
+<pre><code># bad
+result = hash.map { |k, v| v + 1 }
+
+# good
+result = hash.map { |_, v| v + 1 }</code></pre>
+</li>
+
+<li>
+<p><strong>永远不要</strong>使用<code>===</code>判断对象的类型，<code>===</code>只是ruby作为实现如case语句时内部使用的特性方法，如果要判断一个变量的类型，请使用方法<code>is_a?</code>或者<code>kind_of?</code></p>
+</li>
+</ul>
+
+<h2 id="_4">命名</h2>
+<hr />
+<ul>
+<li>
+<p>变量和方法名称使用 <a href="http://blog.lmorchard.com/2013/01/23/naming-conventions">snake_case</a> 蛇底式命名规则</p>
+</li>
+
+<li>
+<p>类和模块名称使用 <a href="http://searchsoa.techtarget.com/definition/CamelCase">CamelCase</a>驼峰式命名规则</p>
+</li>
+
+<li>
+<p>常量名称使用 <a href="#">SCREAMING_SNAKE_CASE</a>大写的蛇底式命名规则</p>
+</li>
+
+<li>
+<p>以<code>?</code>作为询问式方法的结尾(如 <code>Array#empty?</code>)</p>
+</li>
+
+<li>
+<p>一个危险方法（直接改变<code>self</code>或者参数值的方法），不要在方法名之后加<code>!</code></p>
+</li>
+</ul>
+
+<h2 id="_5">类</h2>
+<hr />
+<ul>
+<li>
+<p>避免使用类变量(@@),因为在类继承链中对类变量的修改会影响他的值</p>
+
+<pre><code>class Parent
+  @@class_var = &quot;parent&quot;
+
+  def self.print_class_var
+    puts @@class_var
+  end
+end
+
+class Child &lt; Parent
+  @@class_var = &quot;child&quot;
+end
+
+Parent.print_class_var # =&gt; will print &quot;child&quot;</code></pre>
+</li>
+
+<li>
+<p>使用<code>def self.method</code>定义类方法</p>
+
+<pre><code>class TestClass
+  # bad
+  def TestClass.some_method
+    # body omitted
+  end
+
+  # good
+  def self.some_other_method
+    # body omitted
+  end</code></pre>
+</li>
+
+<li>
+<p>当必要时使用 <code>class &lt;&lt; self</code>,如 类属性或别名</p>
+
+<pre><code>class TestClass
+  # bad
+  class &lt;&lt; self
+    def first_method
+      # body omitted
+    end
+
+    def second_method_etc
+      # body omitted
+    end
+  end
+
+  # good
+  class &lt;&lt; self
+    attr_accessor :per_page
+    alias_method :nwo, :find_by_name_with_owner
+  end
+
+  def self.first_method
+    # body omitted
+  end
+
+  def self.second_method_etc
+    # body omitted
+  end
+end</code></pre>
+</li>
+
+<li>
+<p>缩进<code>public</code>,<code>protected</code>,<code>private</code>方法，为他们之前的间隔留一空行</p>
+
+<pre><code>class SomeClass
+  def public_method
+    # ...
+  end
+
+  private
+  def private_method
+    # ...
+  end
+end</code></pre>
+</li>
+
+<li>
+<p>除非必须使用<code>self</code>表示内部类或对象消息，其他情况不要使用self</p>
+
+<pre><code>class SomeClass
+  attr_accessor :message
+
+  def greeting(name)
+    message = &quot;Hi #{name}&quot; # local variable in Ruby, not attribute writer
+    self.message = message
+  end
+end</code></pre>
+</li>
+</ul>
+
+<h2 id="_6">异常</h2>
+<hr />
+<ul>
+<li>
+<p>不要使用异常作为程序流程控制</p>
+
+<pre><code>class SomeClass
+  attr_accessor :message
+
+  def greeting(name)
+    message = &quot;Hi #{name}&quot; # local variable in Ruby, not attribute writer
+    self.message = message
+  end
+end</code></pre>
+</li>
+
+<li>
+<p>让异常抛出，而不是处理异常</p>
+
+<pre><code># bad
+begin
+  # an exception occurs here
+rescue
+  # exception handling
+end
+
+# still bad
+begin
+  # an exception occurs here
+rescue Exception
+  # exception handling
+end</code></pre>
+</li>
+</ul>
+
+<h2 id="_7">集合</h2>
+<hr />
+<ul>
+<li>
+<p>使用 <code>%w</code> 创建字符串数组</p>
+
+<pre><code># bad
+STATES = [&quot;draft&quot;, &quot;open&quot;, &quot;closed&quot;]
+
+# good
+STATES = %w(draft open closed)</code></pre>
+</li>
+
+<li>
+<p>当数组中元素不可重复时，使用<code>Set</code>代替<code>Array</code>,<code>Set</code>实现了一个戊戌无重复元素的集合，是数组和哈希的结合体</p>
+</li>
+
+<li>
+<p>使用<code>symbols</code>标识符代替字符串作为哈希的键</p>
+
+<pre><code># bad
+hash = { &quot;one&quot; =&gt; 1, &quot;two&quot; =&gt; 2, &quot;three&quot; =&gt; 3 }
+
+# good
+hash = { :one =&gt; 1, :two =&gt; 2, :three =&gt; 3 }</code></pre>
+</li>
+</ul>
+
+<h2 id="_8">字符串</h2>
+<hr />
+<ul>
+<li>
+<p>使用字符串插入，而不用字符串连接</p>
+
+<pre><code># bad
+email_with_name = user.name + &quot; &lt;&quot; + user.email + &quot;&gt;&quot;
+
+# good
+email_with_name = &quot;#{user.name} &lt;#{user.email}&gt;&quot;</code></pre>
+</li>
+
+<li>
+<p>使用双引号<code>&quot;</code>构造字符串对象。字符串插值或转义字符将会在双引号下有效，单引号<code>&#39;</code>往往多在字符串字面量中使用</p>
+
+<pre><code># bad
+name = &#39;Bozhidar&#39;
+
+# good
+name = &quot;Bozhidar&quot;</code></pre>
+</li>
+
+<li>
+<p>当需要多次构造长串的字符串时，使用<code>String#&lt;&lt;</code>而不是使用<code>String#+</code>。</p>
+
+<pre><code># good and also fast
+html = &quot;&quot;
+html &lt;&lt; &quot;&lt;h1&gt;Page title&lt;/h1&gt;&quot;
+
+paragraphs.each do |paragraph|
+  html &lt;&lt; &quot;&lt;p&gt;#{paragraph}&lt;/p&gt;&quot;
+end</code></pre>
+</li>
+</ul>
+
+<h2 id="_9">正则表达式</h2>
+<hr />
+<ul>
+<li>
+<p>避免使用$1-9,而是使用有意义的命名</p>
+
+<pre><code># bad
+/(regexp)/ =~ string
+...
+process $1
+
+# good
+/(?&lt;meaningful_var&gt;regexp)/ =~ string
+...
+process meaningful_var</code></pre>
+</li>
+
+<li>
+<p>注意<code>^</code>/<code>$</code>表示了一行的开始和结尾，而不是表示整个字符串的结尾。当要匹配整个字符串时，使用<code>\A</code>和<code>\z</code></p>
+
+<pre><code>string = &quot;some injection\nusername&quot;
+string[/^username$/]   # matches
+string[/\Ausername\z/] # don&#39;t match</code></pre>
+</li>
+
+<li>
+<p>使用x来构造复杂的表达式</p>
+
+<pre><code>regexp = %r{
+  start         # some text
+  \s            # white space char
+  (group)       # first group
+  (?:alt1|alt2) # some alternation
+  end
+}x</code></pre>
+</li>
+</ul>
+
+<h2 id="_10">百分号字面量</h2>
+<hr />
+<ul>
+<li>
+<p>尽量使用%w</p>
+
+<pre><code>STATES = %w(draft open closed)</code></pre>
+</li>
+
+<li>
+<p>使用在单行字符串中需要使用插值和内嵌的双引号时，使用<code>%()</code></p>
+
+<pre><code># bad (no interpolation needed)
+%(&lt;div class=&quot;text&quot;&gt;Some text&lt;/div&gt;)
+# should be &quot;&lt;div class=\&quot;text\&quot;&gt;Some text&lt;/div&gt;&quot;
+
+# bad (no double-quotes)
+%(This is #{quality} style)
+# should be &quot;This is #{quality} style&quot;
+
+# bad (multiple lines)
+%(&lt;div&gt;\n&lt;span class=&quot;big&quot;&gt;#{exclamation}&lt;/span&gt;\n&lt;/div&gt;)
+# should be a heredoc.
+
+# good (requires interpolation, has quotes, single line)
+%(&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;#{name}&lt;/td&gt;)</code></pre>
+</li>
+
+<li>
+<p>当<code>\</code>匹配不止一个时 ，使用<code>%r</code></p>
+
+<pre><code># bad
+%r(\s+)
+
+# still bad
+%r(^/(.*)$)
+# should be /^\/(.*)$/
+
+# good
+%r(^/blog/2011/(.*)$)</code></pre>
+</li>
+</ul>
+
+<h2 id="_11">哈希</h2>
+<hr />
+<ul>
+<li>
+<p>使用<code>=&gt;</code>作为哈希的键值表示方式</p>
+
+<pre><code># bad
+user = {
+  login: &quot;defunkt&quot;,
+  name: &quot;Chris Wanstrath&quot;
+}
+
+# bad
+user = {
+  login: &quot;defunkt&quot;,
+  name: &quot;Chris Wanstrath&quot;,
+  &quot;followers-count&quot; =&gt; 52390235
+}
+
+# good
+user = {
+  :login =&gt; &quot;defunkt&quot;,
+  :name =&gt; &quot;Chris Wanstrath&quot;,
+  &quot;followers-count&quot; =&gt; 52390235
+}</code></pre>
+</li>
+</ul>
+	  </div>
+
+		
+		<ul class="tag_box list-unstyled list-inline">
+		  <li><i class="fa fa-folder-open"></i></li>
+		  
+		  
+			 
+				<li><a href="http://www.xuzou.me/categories.html#coding-ref">
+					coding <span>(3)</span>
+					,
+				</a></li>
+			 
+				<li><a href="http://www.xuzou.me/categories.html#ruby-ref">
+					ruby <span>(2)</span>
+					
+				</a></li>
+			
+		  
+		</ul>
+		  
+
+		
+		<ul class="list-inline">
+		  <li><i class="fa fa-tags"></i></li>
+		  
+		  
+			 
+				<li>
+					<a href="http://www.xuzou.me/tags.html#ruby-ref">
+					ruby <span>(1)</span>
+					,
+					</a>
+				</li>
+			 
+				<li>
+					<a href="http://www.xuzou.me/tags.html#code style-ref">
+					code style <span>(1)</span>
+					
+					</a>
+				</li>
+			
+		  
+		  
+		</ul>
+		  
+
+		<hr>
+
+		<ul class="pager">
+		  
+		  <li class="previous"><a href="http://www.xuzou.me//writing/2014/02/02/writing-articles-using-markdown.html" title="使用Markdown写文章">&larr; Previous</a></li>
+		  
+		  
+		  <li class="next"><a href="http://www.xuzou.me//coding/ruby/2014/04/05/seven-patterns-to-refactor-fat-activerecord-models.html" title="Seven Patterns to Refactor Fat ActiveRecord Models(转载)">Next &rarr;</a></li>
+		  
+		</ul>
+
+		<hr>
+	</div>
+	
+	<div class="col-sm-2 sidebar-2">
+	
+	</div>
+</article>
+<div class="clearfix"></div>
+
+
+
+			<!-- footer.html -->
+<footer>
+ <hr/>
+ <p>
+ 	&copy; 2014 xuzou with Jekyll. Theme: <a href="https://github.com/dbtek/dbyll">dbyll</a> by dbtek.
+ </p>
+</footer>
+
+<!-- footer.html end -->
+
+
+		</div>
+
+    
+	<script type="text/javascript" src="http://www.xuzou.me/assets/resources/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="http://www.xuzou.me/assets/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="http://www.xuzou.me/assets/js/app.js"></script>
+   </body>
+
+</html>
+
+

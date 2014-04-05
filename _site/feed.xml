@@ -7,6 +7,953 @@
 		<atom:link href="http://www.xuzou.me/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Seven Patterns to Refactor Fat ActiveRecord Models(转载)</title>
+				<description>&lt;p&gt;&lt;a href=&quot;http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/&quot;&gt;原文&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;When teams use Code Climate to improve the quality of their Rails applications, they learn to break the habit of allowing models to get fat. “Fat models” cause maintenance issues in large apps. Only incrementally better than cluttering controllers with domain logic, they usually represent a failure to apply the Single Responsibility Principle (SRP). “Anything related to what a user does” is not a single responsibility.&lt;/p&gt;
+
+&lt;p&gt;Early on, SRP is easier to apply. ActiveRecord classes handle persistence, associations and not much else. But bit-by-bit, they grow. Objects that are inherently responsible for persistence become the de facto owner of all business logic as well. And a year or two later you have a User class with over 500 lines of code, and hundreds of methods in it’s public interface. Callback hell ensues.&lt;/p&gt;
+
+&lt;p&gt;As you add more intrinsic complexity (read: features!) to your application, the goal is to spread it across a coordinated set of small, encapsulated objects (and, at a higher level, modules) just as you might spread cake batter across the bottom of a pan. Fat models are like the big clumps you get when you first pour the batter in. Refactor to break them down and spread out the logic evenly. Repeat this process and you’ll end up with a set of simple objects with well defined interfaces working together in a veritable symphony.&lt;/p&gt;
+
+&lt;p&gt;You may be thinking:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;“But Rails makes it really hard to do OOP right!”&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I used to believe that too. But after some exploration and practice, I realized that Rails (the framework) doesn’t impede OOP all that much. It’s the Rails “conventions” that don’t scale, or, more specifically, the lack of conventions for managing complexity beyond what the Active Record pattern can elegantly handle. Fortunately, we can apply OO-based principles and best practices where Rails is lacking.&lt;/p&gt;
+
+&lt;p&gt;Don’t Extract Mixins from Fat Models&lt;/p&gt;
+
+&lt;p&gt;Let’s get this out of the way. I discourage pulling sets of methods out of a large ActiveRecord class into “concerns”, or modules that are then mixed in to only one model. I once heard someone say:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;“Any application with an app/concerns directory is concerning.”&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;And I agree. Prefer composition to inheritance. Using mixins like this is akin to “cleaning” a messy room by dumping the clutter into six separate junk drawers and slamming them shut. Sure, it looks cleaner at the surface, but the junk drawers actually make it harder to identify and implement the decompositions and extractions necessary to clarify the domain model.&lt;/p&gt;
+
+&lt;p&gt;Now on to the refactorings!&lt;/p&gt;
+
+&lt;h2 id=&quot;1_extract_value_objects&quot;&gt;1. Extract Value Objects&lt;/h2&gt;
+
+&lt;p&gt;Value Objects are simple objects whose equality is dependent on their value rather than an identity. They are usually immutable. Date, URI, and Pathname are examples from Ruby’s standard library, but your application can (and almost certainly should) define domain-specific Value Objects as well. Extracting them from ActiveRecords is low hanging refactoring fruit.&lt;/p&gt;
+
+&lt;p&gt;In Rails, Value Objects are great when you have an attribute or small group of attributes that have logic associated with them. Anything more than basic text fields and counters are candidates for Value Object extraction.&lt;/p&gt;
+
+&lt;p&gt;For example, a text messaging application I worked on had a PhoneNumber Value Object. An e-commerce application needs a Money class. Code Climate has a Value Object named Rating that represents a simple A - F grade that each class or module receives. I could (and originally did) use an instance of a Ruby String, but Rating allows me to combine behavior with the data:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Rating
+  include Comparable
+
+  def self.from_cost(cost)
+    if cost &amp;lt;= 2
+      new(&amp;quot;A&amp;quot;)
+    elsif cost &amp;lt;= 4
+      new(&amp;quot;B&amp;quot;)
+    elsif cost &amp;lt;= 8
+      new(&amp;quot;C&amp;quot;)
+    elsif cost &amp;lt;= 16
+      new(&amp;quot;D&amp;quot;)
+    else
+      new(&amp;quot;F&amp;quot;)
+    end
+  end
+
+  def initialize(letter)
+    @letter = letter
+  end
+
+  def better_than?(other)
+    self &amp;gt; other
+  end
+
+  def &amp;lt;=&amp;gt;(other)
+    other.to_s &amp;lt;=&amp;gt; to_s
+  end
+
+  def hash
+    @letter.hash
+  end
+
+  def eql?(other)
+    to_s == other.to_s
+  end
+
+  def to_s
+    @letter.to_s
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Every ConstantSnapshot then exposes an instance of Rating in its public interface:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class ConstantSnapshot &amp;lt; ActiveRecord::Base
+  # …
+
+  def rating
+    @rating ||= Rating.from_cost(cost)
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Beyond slimming down the ConstantSnapshot class, this has a number of advantages:&lt;/p&gt;
+
+&lt;p&gt;The #worse_than? and #better_than? methods provide a more expressive way to compare ratings than Ruby’s built-in operators (e.g. &amp;lt; and &amp;gt;). Defining #hash and #eql? makes it possible to use a Rating as a hash key. Code Climate uses this to idiomatically group constants by their ratings using Enumberable#group_by. The #to_s method allows me to interpolate a Rating into a string (or template) without any extra work. The class definition provides a convenient place for a factory method, returning the correct Rating for a given “remediation cost” (the estimated time it would take to fix all of the smells in a given class).&lt;/p&gt;
+
+&lt;h2 id=&quot;2_extract_service_objects&quot;&gt;2. Extract Service Objects&lt;/h2&gt;
+
+&lt;p&gt;Some actions in a system warrant a Service Object to encapsulate their operation. I reach for Service Objects when an action meets one or more of these criteria:&lt;/p&gt;
+
+&lt;p&gt;The action is complex (e.g. closing the books at the end of an accounting period) The action reaches across multiple models (e.g. an e-commerce purchase using Order, CreditCard and Customer objects) The action interacts with an external service (e.g. posting to social networks) The action is not a core concern of the underlying model (e.g. sweeping up outdated data after a certain time period). There are multiple ways of performing the action (e.g. authenticating with an access token or password). This is the Gang of Four Strategy pattern. As an example, we could pull a User#authenticate method out into a UserAuthenticator:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class UserAuthenticator
+  def initialize(user)
+    @user = user
+  end
+
+  def authenticate(unencrypted_password)
+    return false unless @user
+
+    if BCrypt::Password.new(@user.password_digest) == unencrypted_password
+      @user
+    else
+      false
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And the SessionsController would look like this:&lt;/p&gt;
+
+&lt;p&gt;class SessionsController &amp;lt; ApplicationController def create user = User.where(email: params[:email]).first&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if UserAuthenticator.new(user).authenticate(params[:password])
+  self.current_user = user
+  redirect_to dashboard_path
+else
+  flash[:alert] = &amp;quot;Login failed.&amp;quot;
+  render &amp;quot;new&amp;quot;
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;end end&lt;/p&gt;
+
+&lt;h2 id=&quot;3_extract_form_objects&quot;&gt;3. Extract Form Objects&lt;/h2&gt;
+
+&lt;p&gt;When multiple ActiveRecord models might be updated by a single form submission, a Form Object can encapsulate the aggregation. This is far cleaner than using accepts_nested_attributes_for, which, in my humble opinion, should be deprecated. A common example would be a signup form that results in the creation of both a Company and a User:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Signup
+  include Virtus
+
+  extend ActiveModel::Naming
+  include ActiveModel::Conversion
+  include ActiveModel::Validations
+
+  attr_reader :user
+  attr_reader :company
+
+  attribute :name, String
+  attribute :company_name, String
+  attribute :email, String
+
+  validates :email, presence: true
+  # … more validations …
+
+  # Forms are never themselves persisted
+  def persisted?
+    false
+  end
+
+  def save
+    if valid?
+      persist!
+      true
+    else
+      false
+    end
+  end
+
+private
+
+  def persist!
+    @company = Company.create!(name: company_name)
+    @user = @company.users.create!(name: name, email: email)
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I’ve started using Virtus in these objects to get ActiveRecord-like attribute functionality. The Form Object quacks like an ActiveRecord, so the controller remains familiar:&lt;/p&gt;
+
+&lt;p&gt;class SignupsController &amp;lt; ApplicationController def create @signup = Signup.new(params[:signup])&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if @signup.save
+  redirect_to dashboard_path
+else
+  render &amp;quot;new&amp;quot;
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;end end This works well for simple cases like the above, but if the persistence logic in the form gets too complex you can combine this approach with a Service Object. As a bonus, since validation logic is often contextual, it can be defined in the place exactly where it matters instead of needing to guard validations in the ActiveRecord itself.&lt;/p&gt;
+
+&lt;h2 id=&quot;4_extract_query_objects&quot;&gt;4. Extract Query Objects&lt;/h2&gt;
+
+&lt;p&gt;For complex SQL queries littering the definition of your ActiveRecord subclass (either as scopes or class methods), consider extracting query objects. Each query object is responsible for returning a result set based on business rules. For example, a Query Object to find abandoned trials might look like this:&lt;/p&gt;
+
+&lt;p&gt;class AbandonedTrialQuery def initialize(relation = Account.scoped) @relation = relation end&lt;/p&gt;
+
+&lt;p&gt;def find_each(&amp;amp;block) @relation. where(plan: nil, invites_count: 0). find_each(&amp;amp;block) end end You might use it in a background job to send emails:&lt;/p&gt;
+
+&lt;p&gt;AbandonedTrialQuery.new.find_each do |account| account.send_offer_for_support end Since ActiveRecord::Relation instances are first class citizens as of Rails 3, they make a great input to a Query Object. This allows you to combine queries using composition:&lt;/p&gt;
+
+&lt;p&gt;old_accounts = Account.where(“created_at &amp;lt; ?”, 1.month.ago) old_abandoned_trials = AbandonedTrialQuery.new(old_accounts) Don’t bother testing a class like this in isolation. Use tests that exercise the object and the database together to ensure the correct rows are returned in the right order and any joins or eager loads are performed (e.g. to avoid N + 1 query bugs).&lt;/p&gt;
+
+&lt;h2 id=&quot;5_introduce_view_objects&quot;&gt;5. Introduce View Objects&lt;/h2&gt;
+
+&lt;p&gt;If logic is needed purely for display purposes, it does not belong in the model. Ask yourself, “If I was implementing an alternative interface to this application, like a voice-activated UI, would I need this?”. If not, consider putting it in a helper or (often better) a View object.&lt;/p&gt;
+
+&lt;p&gt;For example, the donut charts in Code Climate break down class ratings based on a snapshot of the codebase (e.g. Rails on Code Climate) and are encapsulated as a View:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class DonutChart
+  def initialize(snapshot)
+    @snapshot = snapshot
+  end
+
+  def cache_key
+    @snapshot.id.to_s
+  end
+
+  def data
+    # pull data from @snapshot and turn it into a JSON structure
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I often find a one-to-one relationship between Views and ERB (or Haml/Slim) templates. This has led me to start investigating implementations of the Two Step View pattern that can be used with Rails, but I don’t have a clear solution yet.&lt;/p&gt;
+
+&lt;p&gt;Note: The term “Presenter” has caught on in the Ruby community, but I avoid it for its baggage and conflicting use. The “Presenter” term was introduced by Jay Fields to describe what I refer to above as “Form Objects”. Also, Rails unfortunately uses the term “view” to describe what are otherwise known as “templates”. To avoid ambiguity, I sometimes refer to these View objects as “View Models”.&lt;/p&gt;
+
+&lt;h2 id=&quot;6_extract_policy_objects&quot;&gt;6. Extract Policy Objects&lt;/h2&gt;
+
+&lt;p&gt;Sometimes complex read operations might deserve their own objects. In these cases I reach for a Policy Object. This allows you to keep tangential logic, like which users are considered active for analytics purposes, out of your core domain objects. For example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class ActiveUserPolicy
+  def initialize(user)
+    @user = user
+  end
+
+  def active?
+    @user.email_confirmed? &amp;amp;&amp;amp;
+    @user.last_login_at &amp;gt; 14.days.ago
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This Policy Object encapsulates one business rule, that a user is considered active if they have a confirmed email address and have logged in within the last two weeks. You can also use Policy Objects for a group of business rules like an Authorizer that regulates which data a user can access.&lt;/p&gt;
+
+&lt;p&gt;Policy Objects are similar to Service Objects, but I use the term “Service Object” for write operations and “Policy Object” for reads. They are also similar to Query Objects, but Query Objects focus on executing SQL to return a result set, whereas Policy Objects operate on domain models already loaded into memory.&lt;/p&gt;
+
+&lt;h2 id=&quot;7_extract_decorators&quot;&gt;7. Extract Decorators&lt;/h2&gt;
+
+&lt;p&gt;Decorators let you layer on functionality to existing operations, and therefore serve a similar purpose to callbacks. For cases where callback logic only needs to run in some circumstances or including it in the model would give the model too many responsibilities, a Decorator is useful.&lt;/p&gt;
+
+&lt;p&gt;Posting a comment on a blog post might trigger a post to someone’s Facebook wall, but that doesn’t mean the logic should be hard wired into the Comment class. One sign you’ve added too many responsibilities in callbacks is slow and brittle tests or an urge to stub out side effects in wholly unrelated test cases.&lt;/p&gt;
+
+&lt;p&gt;Here’s how you might extract Facebook posting logic into a Decorator:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class FacebookCommentNotifier
+  def initialize(comment)
+    @comment = comment
+  end
+
+  def save
+    @comment.save &amp;amp;&amp;amp; post_to_wall
+  end
+
+private
+
+  def post_to_wall
+    Facebook.post(title: @comment.title, user: @comment.author)
+  end
+end
+And how a controller might use it:
+
+class CommentsController &amp;lt; ApplicationController
+  def create
+    @comment = FacebookCommentNotifier.new(Comment.new(params[:comment]))
+
+    if @comment.save
+      redirect_to blog_path, notice: &amp;quot;Your comment was posted.&amp;quot;
+    else
+      render &amp;quot;new&amp;quot;
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Decorators differ from Service Objects because they layer on responsibilities to existing interfaces. Once decorated, collaborators just treat the FacebookCommentNotifier instance as if it were a Comment. In its standard library, Ruby provides a number of facilities to make building decorators easier with metaprogramming.&lt;/p&gt;
+
+&lt;p&gt;Wrapping Up&lt;/p&gt;
+
+&lt;p&gt;Even in a Rails application, there are many tools to manage complexity in the model layer. None of them require you to throw out Rails. ActiveRecord is a fantastic library, but any pattern breaks down if you depend on it exclusively. Try limiting your ActiveRecords to persistence behavior. Sprinkle in some of these techniques to spread out the logic in your domain model and the result will be a much more maintainable application.&lt;/p&gt;
+
+&lt;p&gt;You’ll also note that many of the patterns described here are quite simple. The objects are just “Plain Old Ruby Objects” (PORO) used in different ways. And that’s part of the point and the beauty of OOP. Every problem doesn’t need to be solved by a framework or library, and naming matters a great deal.&lt;/p&gt;
+
+&lt;p&gt;What do you think of the seven techniques I presented above? What are your favorites and why? Have I missed any? Let me know in the comments!&lt;/p&gt;
+
+&lt;p&gt;P.S. If you found this post useful, you may want to subscribe to our email newsletter (see below). It’s low volume, and includes content about OOP and refactoring Rails applications like this.&lt;/p&gt;</description>
+				<pubDate>Sat, 05 Apr 2014 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/coding/ruby/2014/04/05/seven-patterns-to-refactor-fat-activerecord-models.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/coding/ruby/2014/04/05/seven-patterns-to-refactor-fat-activerecord-models.html</guid>
+			</item>
+		
+			<item>
+				<title>【译】Ruby编码规范</title>
+				<description>&lt;p&gt;本文档翻译与&lt;a href=&quot;https://github.com/styleguide/ruby&quot;&gt;Github ruby-style-guide&lt;/a&gt; &lt;br /&gt;本文档是GitHub内部使用的Ruby规范编码规范。原文档参考了&lt;a href=&quot;https://github.com/bbatsov/ruby-style-guide&quot;&gt;ruby-style-guid&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;&quot;&gt;编码风格&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用空格符进行代码的缩进，而不是使用Tab&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;每行代码少于80个字符&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;不要再一行的后面留有空格&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;每个文件留一空行&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;操作符之后留一个空格，在逗号、冒号、大括号之后留空格&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sum = 1 + 2   
+	a, b = 1, 2    
+1 &amp;gt; 2 ? true : false; puts &amp;quot;Hi&amp;quot;    
+[1, 2, 3].each { |e| puts e } &lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;不要在&lt;code&gt;(, [ 和 ], )&lt;/code&gt;符号之前留空格&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;some(arg).other
+[1, 2, 3].length&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在&lt;code&gt; ! &lt;/code&gt;空格前不要留空格&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;!array.include?(element)&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;缩进 &lt;code&gt;case...when...&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;case
+when song.name == &amp;quot;Misty&amp;quot;
+  puts &amp;quot;Not again!&amp;quot;
+when song.duration &amp;gt; 120
+  puts &amp;quot;Too long!&amp;quot;
+when Time.now.hour &amp;gt; 21
+  puts &amp;quot;It&amp;#39;s too late&amp;quot;
+else
+  song.play
+end
+
+kind = case year
+       when 1850..1889 then &amp;quot;Blues&amp;quot;
+       when 1890..1909 then &amp;quot;Ragtime&amp;quot;
+       when 1910..1929 then &amp;quot;New Orleans Jazz&amp;quot;
+       when 1930..1939 then &amp;quot;Swing&amp;quot;
+       when 1940..1950 then &amp;quot;Bebop&amp;quot;
+       else &amp;quot;Jazz&amp;quot;
+       end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在两个方法之间插入一空行，每个方法内通过空行来归约逻辑关系&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  def some_method
+    data = initialize(options)
+
+    data.manipulate!
+
+    data.result
+  end
+
+  def some_method
+    result
+  end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_2&quot;&gt;文档&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;使用&lt;a href=&quot;http://tomdoc.org/&quot;&gt;TomDoc&lt;/a&gt;规范注释文档格式，其格式大致如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	# Public: Duplicate some text an arbitrary number of times.
+	#
+	# text  - The String to be duplicated.
+	# count - The Integer number of times to duplicate the text.
+	#
+	# Examples
+	#
+	#   multiplex(&amp;quot;Tom&amp;quot;, 4)
+	#   # =&amp;gt; &amp;quot;TomTomTomTom&amp;quot;
+	#
+	# Returns the duplicated String.
+	def multiplex(text, count)
+	  text * count
+	end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;_3&quot;&gt;代码排版约定&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;定义方法时，无参数时省略圆括号，当有参数时需要加圆括号，如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;   def some_method
+     # body omitted
+   end
+
+   def some_method_with_arguments(arg1, arg2)
+     # body omitted
+   end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;不要使用for语句，除非你确定for语句优于迭代方案。请使用each,each方法中会使用for.注意：for语句并不会重新定义一个作用域，在其中定义的变量，在其外部依然可见。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  arr = [1, 2, 3]
+
+  # bad
+  for elem in arr do
+    puts elem
+  end
+
+  # good
+  arr.each { |elem| puts elem }&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;对于多行&lt;code&gt;if/uless&lt;/code&gt;不要使用&lt;code&gt;then&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; # bad
+if some_condition then
+  # body omitted
+end
+
+# good
+if some_condition
+  # body omitted
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;除非其他表达式太过于繁琐，尽量避免使用三元表达式（&lt;code&gt;?:&lt;/code&gt;）。当时用（if/then/else/end）这种结构，并在单行出现时，请使用（&lt;code&gt;?:&lt;/code&gt;）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  # bad
+  result = if some_condition then something else something_else end
+
+  # good
+  result = some_condition ? something : something_else&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用三元表达式时，请勿嵌套使用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  # bad
+  some_condition ? (nested_condition ? nested_something : nested_something_else) : something_else
+
+  # good
+  if some_condition
+    nested_condition ? nested_something : nested_something_else
+  else
+    something_else
+  end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;不提倡使用ruby中&lt;code&gt;and&lt;/code&gt; 和 &lt;code&gt;or&lt;/code&gt; 关键字，永远使用&lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;和&lt;code&gt;||&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在单行中有条件判断语句时，请使用&lt;code&gt;if/unless&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  # bad
+  if some_condition
+    do_something
+  end
+
+  # good
+  do_something if some_condition&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;永远不要&lt;/strong&gt;出现&lt;code&gt;unless&lt;/code&gt;和&lt;code&gt;else&lt;/code&gt; 共同使用 # bad unless success? puts “failure” else puts “success” end&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# good
+if success?
+  puts &amp;quot;success&amp;quot;
+else
+  puts &amp;quot;failure&amp;quot;
+ end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在 &lt;code&gt;if/unless/while&lt;/code&gt;的条件判断语句之后，判断表达式不要使用圆括号&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+if (x &amp;gt; 10)
+  # body omitted
+end
+
+# good
+if x &amp;gt; 10
+  # body omitted
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在单行块中使用&lt;code&gt;{...}&lt;/code&gt;。&lt;strong&gt;永远不要&lt;/strong&gt;在多行中使用&lt;code&gt;{...}&lt;/code&gt;，而是使用&lt;code&gt;do...end&lt;/code&gt;。在调用链中不要使用&lt;code&gt;do...end&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;names = [&amp;quot;Bozhidar&amp;quot;, &amp;quot;Steve&amp;quot;, &amp;quot;Sarah&amp;quot;]
+
+# good
+names.each { |name| puts name }
+
+# bad
+names.each do |name|
+  puts name
+end
+
+# good
+names.select { |name| name.start_with?(&amp;quot;S&amp;quot;) }.map { |name| name.upcase }
+
+# bad
+names.select do |name|
+  name.start_with?(&amp;quot;S&amp;quot;)
+end.map { |name| name.upcase }&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;避免使用不必要的&lt;code&gt;return&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+def some_method(some_arr)
+  return some_arr.size
+end
+
+# good
+def some_method(some_arr)
+  some_arr.size
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;当为方法的参数赋默认值时，在&lt;code&gt;=&lt;/code&gt;号前后添加空格&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+def some_method(arg1=:default, arg2=nil, arg3=[])
+  # do something...
+end
+
+# good
+def some_method(arg1 = :default, arg2 = nil, arg3 = [])
+  # do something...
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;可以对使用返回值进行赋值&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+if (v = array.grep(/foo/)) ...
+
+# good
+if v = array.grep(/foo/) ...
+
+# also good - has correct precedence.
+if (v = next_value) == &amp;quot;hello&amp;quot; ...&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;在可以的时候尽量使用&lt;code&gt;||=&lt;/code&gt;进行变量的初始化&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# set name to Bozhidar, only if it&amp;#39;s nil or false
+name ||= &amp;quot;Bozhidar&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;永远不要&lt;/strong&gt;使用&lt;code&gt;||=&lt;/code&gt;初始赋值布尔类型变量&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad - would set enabled to true even if it was false
+enabled ||= true
+
+# good
+enabled = true if enabled.nil?&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;避免使用Perl风格的变量命名（如$0-9,$,etc）.这种命名方式过于简单而无意义。请使用有意义的命名发如（$PROGRAM_NAME）。&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;永远不要&lt;/strong&gt;再方法名之后添加空格&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+f (3 + 2) + 1
+
+# good
+f(3 + 2) + 1&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;如果方法名称之后是一个圆括号，则在之后都是用括号(如f((3 + 2) + 1))&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用&lt;code&gt;_&lt;/code&gt;作为块中未使用的参数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+result = hash.map { |k, v| v + 1 }
+
+# good
+result = hash.map { |_, v| v + 1 }&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;永远不要&lt;/strong&gt;使用&lt;code&gt;===&lt;/code&gt;判断对象的类型，&lt;code&gt;===&lt;/code&gt;只是ruby作为实现如case语句时内部使用的特性方法，如果要判断一个变量的类型，请使用方法&lt;code&gt;is_a?&lt;/code&gt;或者&lt;code&gt;kind_of?&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_4&quot;&gt;命名&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;变量和方法名称使用 &lt;a href=&quot;http://blog.lmorchard.com/2013/01/23/naming-conventions&quot;&gt;snake_case&lt;/a&gt; 蛇底式命名规则&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;类和模块名称使用 &lt;a href=&quot;http://searchsoa.techtarget.com/definition/CamelCase&quot;&gt;CamelCase&lt;/a&gt;驼峰式命名规则&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;常量名称使用 &lt;a href=&quot;#&quot;&gt;SCREAMING_SNAKE_CASE&lt;/a&gt;大写的蛇底式命名规则&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;以&lt;code&gt;?&lt;/code&gt;作为询问式方法的结尾(如 &lt;code&gt;Array#empty?&lt;/code&gt;)&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;一个危险方法（直接改变&lt;code&gt;self&lt;/code&gt;或者参数值的方法），不要在方法名之后加&lt;code&gt;!&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_5&quot;&gt;类&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;避免使用类变量(@@),因为在类继承链中对类变量的修改会影响他的值&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Parent
+  @@class_var = &amp;quot;parent&amp;quot;
+
+  def self.print_class_var
+    puts @@class_var
+  end
+end
+
+class Child &amp;lt; Parent
+  @@class_var = &amp;quot;child&amp;quot;
+end
+
+Parent.print_class_var # =&amp;gt; will print &amp;quot;child&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用&lt;code&gt;def self.method&lt;/code&gt;定义类方法&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class TestClass
+  # bad
+  def TestClass.some_method
+    # body omitted
+  end
+
+  # good
+  def self.some_other_method
+    # body omitted
+  end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;当必要时使用 &lt;code&gt;class &amp;lt;&amp;lt; self&lt;/code&gt;,如 类属性或别名&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class TestClass
+  # bad
+  class &amp;lt;&amp;lt; self
+    def first_method
+      # body omitted
+    end
+
+    def second_method_etc
+      # body omitted
+    end
+  end
+
+  # good
+  class &amp;lt;&amp;lt; self
+    attr_accessor :per_page
+    alias_method :nwo, :find_by_name_with_owner
+  end
+
+  def self.first_method
+    # body omitted
+  end
+
+  def self.second_method_etc
+    # body omitted
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;缩进&lt;code&gt;public&lt;/code&gt;,&lt;code&gt;protected&lt;/code&gt;,&lt;code&gt;private&lt;/code&gt;方法，为他们之前的间隔留一空行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class SomeClass
+  def public_method
+    # ...
+  end
+
+  private
+  def private_method
+    # ...
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;除非必须使用&lt;code&gt;self&lt;/code&gt;表示内部类或对象消息，其他情况不要使用self&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class SomeClass
+  attr_accessor :message
+
+  def greeting(name)
+    message = &amp;quot;Hi #{name}&amp;quot; # local variable in Ruby, not attribute writer
+    self.message = message
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_6&quot;&gt;异常&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;不要使用异常作为程序流程控制&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class SomeClass
+  attr_accessor :message
+
+  def greeting(name)
+    message = &amp;quot;Hi #{name}&amp;quot; # local variable in Ruby, not attribute writer
+    self.message = message
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;让异常抛出，而不是处理异常&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+begin
+  # an exception occurs here
+rescue
+  # exception handling
+end
+
+# still bad
+begin
+  # an exception occurs here
+rescue Exception
+  # exception handling
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_7&quot;&gt;集合&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用 &lt;code&gt;%w&lt;/code&gt; 创建字符串数组&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+STATES = [&amp;quot;draft&amp;quot;, &amp;quot;open&amp;quot;, &amp;quot;closed&amp;quot;]
+
+# good
+STATES = %w(draft open closed)&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;当数组中元素不可重复时，使用&lt;code&gt;Set&lt;/code&gt;代替&lt;code&gt;Array&lt;/code&gt;,&lt;code&gt;Set&lt;/code&gt;实现了一个戊戌无重复元素的集合，是数组和哈希的结合体&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用&lt;code&gt;symbols&lt;/code&gt;标识符代替字符串作为哈希的键&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+hash = { &amp;quot;one&amp;quot; =&amp;gt; 1, &amp;quot;two&amp;quot; =&amp;gt; 2, &amp;quot;three&amp;quot; =&amp;gt; 3 }
+
+# good
+hash = { :one =&amp;gt; 1, :two =&amp;gt; 2, :three =&amp;gt; 3 }&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_8&quot;&gt;字符串&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用字符串插入，而不用字符串连接&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+email_with_name = user.name + &amp;quot; &amp;lt;&amp;quot; + user.email + &amp;quot;&amp;gt;&amp;quot;
+
+# good
+email_with_name = &amp;quot;#{user.name} &amp;lt;#{user.email}&amp;gt;&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用双引号&lt;code&gt;&amp;quot;&lt;/code&gt;构造字符串对象。字符串插值或转义字符将会在双引号下有效，单引号&lt;code&gt;&amp;#39;&lt;/code&gt;往往多在字符串字面量中使用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+name = &amp;#39;Bozhidar&amp;#39;
+
+# good
+name = &amp;quot;Bozhidar&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;当需要多次构造长串的字符串时，使用&lt;code&gt;String#&amp;lt;&amp;lt;&lt;/code&gt;而不是使用&lt;code&gt;String#+&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# good and also fast
+html = &amp;quot;&amp;quot;
+html &amp;lt;&amp;lt; &amp;quot;&amp;lt;h1&amp;gt;Page title&amp;lt;/h1&amp;gt;&amp;quot;
+
+paragraphs.each do |paragraph|
+  html &amp;lt;&amp;lt; &amp;quot;&amp;lt;p&amp;gt;#{paragraph}&amp;lt;/p&amp;gt;&amp;quot;
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_9&quot;&gt;正则表达式&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;避免使用$1-9,而是使用有意义的命名&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+/(regexp)/ =~ string
+...
+process $1
+
+# good
+/(?&amp;lt;meaningful_var&amp;gt;regexp)/ =~ string
+...
+process meaningful_var&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;注意&lt;code&gt;^&lt;/code&gt;/&lt;code&gt;$&lt;/code&gt;表示了一行的开始和结尾，而不是表示整个字符串的结尾。当要匹配整个字符串时，使用&lt;code&gt;\A&lt;/code&gt;和&lt;code&gt;\z&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;string = &amp;quot;some injection\nusername&amp;quot;
+string[/^username$/]   # matches
+string[/\Ausername\z/] # don&amp;#39;t match&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用x来构造复杂的表达式&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;regexp = %r{
+  start         # some text
+  \s            # white space char
+  (group)       # first group
+  (?:alt1|alt2) # some alternation
+  end
+}x&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_10&quot;&gt;百分号字面量&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;尽量使用%w&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;STATES = %w(draft open closed)&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;使用在单行字符串中需要使用插值和内嵌的双引号时，使用&lt;code&gt;%()&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad (no interpolation needed)
+%(&amp;lt;div class=&amp;quot;text&amp;quot;&amp;gt;Some text&amp;lt;/div&amp;gt;)
+# should be &amp;quot;&amp;lt;div class=\&amp;quot;text\&amp;quot;&amp;gt;Some text&amp;lt;/div&amp;gt;&amp;quot;
+
+# bad (no double-quotes)
+%(This is #{quality} style)
+# should be &amp;quot;This is #{quality} style&amp;quot;
+
+# bad (multiple lines)
+%(&amp;lt;div&amp;gt;\n&amp;lt;span class=&amp;quot;big&amp;quot;&amp;gt;#{exclamation}&amp;lt;/span&amp;gt;\n&amp;lt;/div&amp;gt;)
+# should be a heredoc.
+
+# good (requires interpolation, has quotes, single line)
+%(&amp;lt;tr&amp;gt;&amp;lt;td class=&amp;quot;name&amp;quot;&amp;gt;#{name}&amp;lt;/td&amp;gt;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;当&lt;code&gt;\&lt;/code&gt;匹配不止一个时 ，使用&lt;code&gt;%r&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+%r(\s+)
+
+# still bad
+%r(^/(.*)$)
+# should be /^\/(.*)$/
+
+# good
+%r(^/blog/2011/(.*)$)&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;_11&quot;&gt;哈希&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用&lt;code&gt;=&amp;gt;&lt;/code&gt;作为哈希的键值表示方式&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# bad
+user = {
+  login: &amp;quot;defunkt&amp;quot;,
+  name: &amp;quot;Chris Wanstrath&amp;quot;
+}
+
+# bad
+user = {
+  login: &amp;quot;defunkt&amp;quot;,
+  name: &amp;quot;Chris Wanstrath&amp;quot;,
+  &amp;quot;followers-count&amp;quot; =&amp;gt; 52390235
+}
+
+# good
+user = {
+  :login =&amp;gt; &amp;quot;defunkt&amp;quot;,
+  :name =&amp;gt; &amp;quot;Chris Wanstrath&amp;quot;,
+  &amp;quot;followers-count&amp;quot; =&amp;gt; 52390235
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description>
+				<pubDate>Mon, 10 Mar 2014 00:00:00 +0800</pubDate>
+				<link>http://www.xuzou.me/coding/ruby/2014/03/10/ruby-styleguide.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/coding/ruby/2014/03/10/ruby-styleguide.html</guid>
+			</item>
+		
+			<item>
 				<title>使用Markdown写文章</title>
 				<description>&lt;h3 id=&quot;_markdown&quot;&gt;关于 Markdown&lt;/h3&gt;
 
@@ -68,8 +1015,8 @@
 
 &lt;pre&gt;&lt;code&gt;![Alt text](/path/to/img.jpg)&lt;/code&gt;&lt;/pre&gt;</description>
 				<pubDate>Sun, 02 Feb 2014 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/writing-articles-using-markdown.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E6%96%87%E5%AD%97/2014/02/02/writing-articles-using-markdown.html</guid>
+				<link>http://www.xuzou.me/writing/2014/02/02/writing-articles-using-markdown.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/writing/2014/02/02/writing-articles-using-markdown.html</guid>
 			</item>
 		
 			<item>
@@ -84,8 +1031,8 @@
 
 &lt;p&gt;git 分支是轻量的分支，在各个分支切换十分方便，分支与主支在同一目录下，可以方便的查看分支的状态 &lt;br /&gt;svn 的分支基本是在与主支（trunk）不同的目录（branchs）下,切换繁琐&lt;/p&gt;</description>
 				<pubDate>Sun, 02 Feb 2014 00:00:00 +0800</pubDate>
-				<link>http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E7%BC%96%E7%A8%8B/git/2014/02/02/git-vs-svn.html</link>
-				<guid isPermaLink="true">http://www.xuzou.me/%E5%85%B3%E4%BA%8E%E7%BC%96%E7%A8%8B/git/2014/02/02/git-vs-svn.html</guid>
+				<link>http://www.xuzou.me/coding/git/2014/02/02/git-vs-svn.html</link>
+				<guid isPermaLink="true">http://www.xuzou.me/coding/git/2014/02/02/git-vs-svn.html</guid>
 			</item>
 		
 	</channel>

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 【译】Ruby编码规范
-categories: [编程,翻译,Ruby]
+categories: [coding,Ruby]
 tags: [ruby,code style]
 fullview: true
 ---
